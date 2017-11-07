@@ -15,6 +15,9 @@ a pickup, jump, death and laser.
 * **Listen to Sound** Hear a preview before saving the sound.
 * **Save Sounds** Save the generated sound to file.
 
+## Stretch Goals
+
+* **Customise sounds** Choose custom settings to alter the sounds
 
 
 
