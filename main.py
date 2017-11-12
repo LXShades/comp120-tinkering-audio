@@ -14,7 +14,8 @@ class App:
         pygame.init()
         pygame.mixer.init()
 
-        self.screen = pygame.display.set_mode((640, 481))  # 481 for extra uniqueness points
+        self.screen = pygame.display.set_mode(
+            (640, 481))  # 481 for extra uniqueness points
 
         self.create_sine()
 
@@ -35,13 +36,13 @@ class App:
         base_sound = pygame.mixer.Sound("wilhelmScream.wav")
         samples = pygame.sndarray.samples(base_sound)
 
-        for index, sample in enumerate(samples):
-            sample = math.sin(2.0 * math.pi * 440 * index / 22050)
+        for index, sample in numpy.ndenumerate(samples):
+            samples[index[0], index[1]] = math.sin(
+                2.0 * math.pi * 440 * index[0] / 22050) * 28000
 
         del (samples)
         base_sound.play()
 
-        # Main code run!
 
-
+# Main code run!
 App()
