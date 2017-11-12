@@ -18,8 +18,10 @@ a pickup, jump, death and laser.
 ## Stretch Goals
 
 * **Customise sounds** Choose custom settings to alter the sounds
+* Super stretch goal 1: **Basic filters and controls**
+* Super stretch goal 2: **Curves/line graphs** to affect the values of a filter over time.
 
+## Technical notes
 
-
-
-
+* **Potential sound types** Sine wave, saw wave, square wave, more?
+* **Potential filters types** Pitch, volume, clip, combine, reverse, more?
