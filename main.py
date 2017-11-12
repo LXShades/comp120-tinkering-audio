@@ -14,8 +14,7 @@ class App:
         pygame.init()
         pygame.mixer.init()
 
-        self.screen = pygame.display.set_mode(
-            (640, 481))  # 481 for extra uniqueness points
+        self.screen = pygame.display.set_mode((640, 481))  # 481 for extra uniqueness points
 
         self.create_sine()
 
@@ -37,11 +36,25 @@ class App:
         samples = pygame.sndarray.samples(base_sound)
 
         for index, sample in numpy.ndenumerate(samples):
-            samples[index[0], index[1]] = math.sin(
-                2.0 * math.pi * 440 * index[0] / 22050) * 28000
+            samples[index[0], index[1]] = math.sin(2.0 * math.pi * 440 * index[0] / 22050) * 28000
+
+        self.change_frequency(samples, 2)
 
         del (samples)
         base_sound.play()
+
+    # sample access at 'time' for left: sample[time, 0]
+    # sample access at 'time' for right: sample[time, 1]
+    # first sample (left): sample[0, 0]
+    # first sample (right): sample[0, 1]
+    # second sample (left): sample[1, 0]
+    # second sample (right): sample[1, 1]
+    def change_frequency(self, sample_array, multiplier):
+        for index, sample in numpy.ndenumerate(sample_array):
+            if (index[0] * multiplier) >= (sample_array.shape[0]):
+                break
+            else:
+                sample_array[index[0], index[1]] = sample_array[index[0] * multiplier, index[1]]
 
 
 # Main code run!
