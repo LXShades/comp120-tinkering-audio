@@ -18,8 +18,9 @@ a pickup, jump, death and laser.
 ## Stretch Goals
 
 * **Customise sounds** Choose custom settings to alter the sounds
-
-
+* **Advanced customisation for lasers:** e.g. laser has a charge up stage and firing stage and optional effects e.g. echo and distortion
+* **Advanced customisation for jump:** Sound length, start/end volume
+* **Advanced customisation
 
 
 
