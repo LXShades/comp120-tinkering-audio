@@ -1,8 +1,9 @@
+import math
+
 import pygame
 import numpy
-import math
-import wave
-import struct
+
+from dynsound import DynSound
 
 
 class App:
@@ -13,10 +14,6 @@ class App:
 
     screen = None
     running = False
-
-
-    # Temporary sound attribute
-    sound = None
 
     def __init__(self):
         self.run()
@@ -44,8 +41,9 @@ class App:
         self.running = False
 
     def create_sine(self):
-        self.sound = pygame.mixer.Sound("wilhelmScream.wav")
-        samples = pygame.sndarray.samples(self.sound)
+        sound = DynSound(num_frames=22050)
+        #sound = DynSound(num_frames=22050)
+        samples = pygame.sndarray.samples(sound.sound)
 
         packaged_value = None
 
@@ -55,74 +53,12 @@ class App:
 
         del samples
 
-        self.change_frequency(self.sound, 0.5)
-        self.change_volume(self.sound, -10)
+        sound.change_frequency(0.5)
+        sound.change_volume(-10)
 
-        self.save_sound("testSound.wav", self.sound)
+        sound.save("testSound.wav")
 
-        self.sound.play()
-
-    def save_sound(self, file_name, sound):
-        samples = pygame.sndarray.samples(sound)
-
-        saved_sound = wave.open(file_name, "w")
-        saved_sound.setparams((samples.shape[1], math.fabs(self.SIZE / 8), self.FREQUENCY, samples.shape[0], "NONE", ""))
-
-        sample_values = []
-
-        for index, sample in numpy.ndenumerate(samples):
-            packaged_value = struct.pack("<h", samples[index[0], index[1]])
-            sample_values.append(packaged_value)
-
-        value_string = "".join(sample_values)
-        saved_sound.writeframes(value_string)
-
-        saved_sound.close()
-
-        samples = pygame.sndarray.samples(sound)
-
-    def change_frequency(self, sound, multiplier):
-        # Create a copy of the samples so we can resize them
-        sample_array = pygame.sndarray.array(sound)
-
-        if multiplier > 1.0:
-            # Increase frequency
-            for index, sample in numpy.ndenumerate(sample_array):
-                if int(index[0] * multiplier) >= sample_array.shape[0]:
-                    break
-                else:
-                    sample_array[index[0], index[1]] = sample_array[
-                        int(index[0] * multiplier), index[1]]
-
-            sample_array.resize((
-                int(math.ceil(sample_array.shape[0] / float(multiplier))),
-                int(sample_array.shape[1])))
-        elif multiplier < 1.0:
-            # Decrease frequency
-            sample_array.resize((
-                int(math.ceil(sample_array.shape[0] / float(multiplier))),
-                int(sample_array.shape[1])))
-
-            for frame in xrange(sample_array.shape[0] - 1, 0, -1):
-                for channel in xrange(sample_array.shape[1]):
-                    sample_array[frame, channel] = \
-                        sample_array[int(frame * multiplier), channel]
-
-        # Update the length of sound by copying data
-        # (super efficient as always)
-        self.sound = pygame.mixer.Sound(sample_array)
-
-        del sample_array
-
-    def change_volume(self, sound, db):
-        sample_array = pygame.sndarray.samples(sound)
-
-        multiplier = pow(10, float(db) / 20)
-        for index, sample in numpy.ndenumerate(sample_array):
-            # Todo limits checking (clipping)
-            sample_array[index[0], index[1]] *= multiplier
-
-        del sample_array
+        sound.play()
 
 
 # Main code run!
