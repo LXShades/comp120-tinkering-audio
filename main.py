@@ -6,6 +6,20 @@ import struct
 
 
 class App:
+
+    """
+    Sound editor app.
+
+    Attributes:
+        FREQUENCY (int): Frequency of sound.
+        SIZE (int): Size of sound in bits.
+        CHANNELS (int): Number of channels.
+        BUFFER (int): Size of buffer.
+
+        screen (pygame.Display): The main application screen.
+        running (bool): If the program is running or not.
+    """
+
     FREQUENCY = 22050
     SIZE = -16
     CHANNELS = 2
@@ -14,14 +28,17 @@ class App:
     screen = None
     running = False
 
-
     # Temporary sound attribute
     sound = None
 
     def __init__(self):
+        """Class constructor"""
+
         self.run()
 
     def run(self):
+        """Run the application."""
+
         pygame.init()
         pygame.mixer.init(frequency=self.FREQUENCY, size=self.SIZE, channels=self.CHANNELS, buffer=self.BUFFER)
 
@@ -41,13 +58,15 @@ class App:
             pygame.display.flip()
 
     def quit(self):
+        """Quits the application"""
+
         self.running = False
 
     def create_sine(self):
+        """Creates an empty sound wave from the wilhelmScream (The origin of all life)"""
+
         self.sound = pygame.mixer.Sound("wilhelmScream.wav")
         samples = pygame.sndarray.samples(self.sound)
-
-        packaged_value = None
 
         for index, sample in numpy.ndenumerate(samples):
             samples[index[0], index[1]] = math.sin(
@@ -63,6 +82,13 @@ class App:
         self.sound.play()
 
     def save_sound(self, file_name, sound):
+        """
+        Saves a sound to disk.
+
+        Args:
+             file_name (string): The file name to save the sound with. File extension must be included.
+             sound (pygame.mixer.Sound): The Sound to be saved.
+        """
         samples = pygame.sndarray.samples(sound)
 
         saved_sound = wave.open(file_name, "w")
@@ -82,6 +108,14 @@ class App:
         samples = pygame.sndarray.samples(sound)
 
     def change_frequency(self, sound, multiplier):
+        """
+        Change the pitch of a sound.
+
+        Args:
+            sound (pygame.mixer.Sound): The sound to be altered.
+            multiplier (float): The multiplier to be applied to the sound's frequency.
+        """
+
         # Create a copy of the samples so we can resize them
         sample_array = pygame.sndarray.array(sound)
 
@@ -115,6 +149,13 @@ class App:
         del sample_array
 
     def change_volume(self, sound, db):
+        """
+        Change the volume of a sound.
+
+        sound (pygame.mixer.Sound): The sound to alter.
+        db (float): Decibels to change sound volume by.
+        """
+
         sample_array = pygame.sndarray.samples(sound)
 
         multiplier = pow(10, float(db) / 20)
