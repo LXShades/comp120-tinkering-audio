@@ -50,6 +50,12 @@ class DynSound:
             self.sample_rate = sample_rate
 
     def save(self, file_name):
+        """
+        Saves a sound to disk.
+
+        Args:
+             file_name (string): The file name to save the sound with. File extension must be included.
+        """
         samples = pygame.sndarray.samples(self.sound)
 
         saved_sound = wave.open(file_name, "w")
@@ -68,6 +74,13 @@ class DynSound:
         saved_sound.close()
 
     def change_frequency(self,  multiplier):
+        """
+        Change the pitch of a sound.
+
+        Args:
+            sound (pygame.mixer.Sound): The sound to be altered.
+            multiplier (float): The multiplier to be applied to the sound's frequency.
+        """
         # Create a copy of the samples so we can resize them
         sample_array = pygame.sndarray.array(self.sound)
 
@@ -99,6 +112,12 @@ class DynSound:
         self.sound = pygame.mixer.Sound(sample_array)
 
     def change_volume(self, db):
+        """
+        Change the volume of a sound.
+
+        sound (pygame.mixer.Sound): The sound to alter.
+        db (float): Decibels to change sound volume by.
+        """
         sample_array = pygame.sndarray.samples(self.sound)
 
         multiplier = pow(10, float(db) / 20)
@@ -107,4 +126,5 @@ class DynSound:
             sample_array[index[0], index[1]] *= multiplier
 
     def play(self):
+        """Play the sound"""
         self.sound.play()
