@@ -6,15 +6,24 @@ import struct
 
 
 class App:
+    FREQUENCY = 22050
+    SIZE = -16
+    CHANNELS = 2
+    BUFFER = 4096
+
     screen = None
     running = False
+
+
+    # Temporary sound attribute
+    sound = None
 
     def __init__(self):
         self.run()
 
     def run(self):
         pygame.init()
-        pygame.mixer.init()
+        pygame.mixer.init(frequency=self.FREQUENCY, size=self.SIZE, channels=self.CHANNELS, buffer=self.BUFFER)
 
         self.screen = pygame.display.set_mode(
             (640, 481))  # 481 for extra uniqueness points
@@ -35,8 +44,8 @@ class App:
         self.running = False
 
     def create_sine(self):
-        base_sound = pygame.mixer.Sound("wilhelmScream.wav")
-        samples = pygame.sndarray.samples(base_sound)
+        self.sound = pygame.mixer.Sound("wilhelmScream.wav")
+        samples = pygame.sndarray.samples(self.sound)
 
         packaged_value = None
 
@@ -46,18 +55,18 @@ class App:
 
         del samples
 
-        self.change_frequency(base_sound, 2)
-        self.change_volume(base_sound, -10)
+        self.change_frequency(self.sound, 2)
+        self.change_volume(self.sound, -10)
 
-        self.save_sound("testSound.wav", base_sound)
+        self.save_sound("testSound.wav", self.sound)
 
-        base_sound.play()
+        self.sound.play()
 
     def save_sound(self, file_name, sound):
         samples = pygame.sndarray.samples(sound)
 
         saved_sound = wave.open(file_name, "w")
-        saved_sound.setparams((2, 2, 22050, len(samples), "NONE", ""))
+        saved_sound.setparams((self.CHANNELS, math.fabs(self.SIZE / 8), self.FREQUENCY, len(samples), "NONE", ""))
         packaged_value = None
 
         sample_values = []
@@ -98,7 +107,7 @@ class App:
                       int(math.ceil(sample_array.shape[0] / float(multiplier))),
                       int(sample_array.shape[1])))
 
-        sound = pygame.mixer.Sound(new_array)
+        self.sound = pygame.mixer.Sound(new_array)
 
         del sample_array
 
