@@ -16,7 +16,8 @@ class App:
         pygame.init()
         pygame.mixer.init()
 
-        self.screen = pygame.display.set_mode((640, 481))  # 481 for extra uniqueness points
+        self.screen = pygame.display.set_mode(
+            (640, 481))  # 481 for extra uniqueness points
 
         self.create_sine()
 
@@ -40,7 +41,8 @@ class App:
         packaged_value = None
 
         for index, sample in numpy.ndenumerate(samples):
-            samples[index[0], index[1]] = math.sin(2.0 * math.pi * 440 * index[0] / 22050) * 28000
+            samples[index[0], index[1]] = math.sin(
+                2.0 * math.pi * 440 * index[0] / 22050) * 28000
 
 
         self.change_frequency(samples, 2)
@@ -80,13 +82,14 @@ class App:
             if (index[0] * multiplier) >= (sample_array.shape[0]):
                 break
             else:
-                sample_array[index[0], index[1]] = sample_array[index[0] * multiplier, index[1]]
+                sample_array[index[0], index[1]] = sample_array[
+                    index[0] * multiplier, index[1]]
 
     def change_volume(self, sample_array, db):
         multiplier = pow(10, float(db) / 20)
         for index, sample in numpy.ndenumerate(sample_array):
             # Todo limits checking (clipping)
-            sample_array[index[0],index[1]] *= multiplier
+            sample_array[index[0], index[1]] *= multiplier
 
 
 # Main code run!

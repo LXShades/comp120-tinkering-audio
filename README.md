@@ -17,9 +17,12 @@ a pickup, jump, death and laser.
 
 ## Stretch Goals
 
-* **Customise sounds** Choose custom settings to alter the sounds
-* Super stretch goal 1: **Basic filters and controls**
+* **Customise sounds** Choose custom settings to alter the sounds* Super stretch goal 1: **Basic filters and controls**
 * Super stretch goal 2: **Curves/line graphs** to affect the values of a filter over time.
+## Additional stretch goals (old uncomitted version for review)
+* **Advanced customisation for lasers:** e.g. laser has a charge up stage and firing stage and optional effects e.g. echo and distortion
+* **Advanced customisation for jump:** Sound length, start/end volume
+* **Advanced customisation
 
 ## Technical notes
 
