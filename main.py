@@ -32,7 +32,7 @@ class App:
             pygame.display.flip()
 
     def quit(self):
-        running = False
+        self.running = False
 
     def create_sine(self):
         base_sound = pygame.mixer.Sound("wilhelmScream.wav")
@@ -44,16 +44,18 @@ class App:
             samples[index[0], index[1]] = math.sin(
                 2.0 * math.pi * 440 * index[0] / 22050) * 28000
 
+        del samples
 
-        self.change_frequency(samples, 2)
-        self.change_volume(samples, -10)
+        self.change_frequency(base_sound, 2)
+        self.change_volume(base_sound, -10)
 
-        self.save_sound("testSound.wav", samples)
+        self.save_sound("testSound.wav", base_sound)
 
-        del (samples)
         base_sound.play()
 
-    def save_sound(self, file_name, samples):
+    def save_sound(self, file_name, sound):
+        samples = pygame.sndarray.samples(sound)
+
         saved_sound = wave.open(file_name, "w")
         saved_sound.setparams((2, 2, 22050, len(samples), "NONE", ""))
         packaged_value = None
@@ -71,25 +73,44 @@ class App:
 
         saved_sound.close()
 
-    # sample access at 'time' for left: sample[time, 0]
-    # sample access at 'time' for right: sample[time, 1]
-    # first sample (left): sample[0, 0]
-    # first sample (right): sample[0, 1]
-    # second sample (left): sample[1, 0]
-    # second sample (right): sample[1, 1]
-    def change_frequency(self, sample_array, multiplier):
-        for index, sample in numpy.ndenumerate(sample_array):
-            if (index[0] * multiplier) >= (sample_array.shape[0]):
-                break
-            else:
-                sample_array[index[0], index[1]] = sample_array[
-                    index[0] * multiplier, index[1]]
+        samples = pygame.sndarray.samples(sound)
 
-    def change_volume(self, sample_array, db):
+    def change_frequency(self, sound, multiplier):
+        sample_array = pygame.sndarray.samples(sound)
+
+        # Increase frequency
+        if multiplier > 1.0:
+            for index, sample in numpy.ndenumerate(sample_array):
+                if (index[0] * multiplier) >= (sample_array.shape[0]):
+                    break
+                else:
+                    sample_array[index[0], index[1]] = sample_array[
+                        index[0] * multiplier, index[1]]
+
+            numpy.resize(sample_array, (
+                      int(math.ceil(sample_array.shape[0] / multiplier)),
+                      int(sample_array.shape[1])))
+
+        # Update the length of sound by copying data
+        # (super efficient as always)
+        new_array = sample_array.copy()
+        new_array.resize((
+                      int(math.ceil(sample_array.shape[0] / float(multiplier))),
+                      int(sample_array.shape[1])))
+
+        sound = pygame.mixer.Sound(new_array)
+
+        del sample_array
+
+    def change_volume(self, sound, db):
+        sample_array = pygame.sndarray.samples(sound)
+
         multiplier = pow(10, float(db) / 20)
         for index, sample in numpy.ndenumerate(sample_array):
             # Todo limits checking (clipping)
             sample_array[index[0], index[1]] *= multiplier
+
+        del sample_array
 
 
 # Main code run!
