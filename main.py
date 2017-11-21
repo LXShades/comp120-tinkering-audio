@@ -74,6 +74,9 @@ class App:
         sound.change_frequency(0.5)
         sound.change_volume(-10)
 
+        wilhelm = DynSound("wilhelmscream.wav")
+        sound.mix(wilhelm)
+
         sound.save("testSound.wav")
 
         sound.play()

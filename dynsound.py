@@ -73,6 +73,22 @@ class DynSound:
 
         saved_sound.close()
 
+    def mix(self, sound2):
+        # Create a copy of the samples so we can resize them
+        sample_array = pygame.sndarray.array(self.sound)
+        sample_array2 = pygame.sndarray.array(sound2.sound)
+
+        min_length = min(sample_array.shape[0], sample_array2.shape[0])
+
+        for frame in xrange(0, min_length):
+            sample_array[frame, 0] = (sample_array[frame, 0] + sample_array2[frame, 0])
+
+        self.sound = pygame.mixer.Sound(sample_array)
+
+    def add_echo(self, delay, volume_change, num_echoes):
+        pass
+
+
     def change_frequency(self,  multiplier):
         """
         Change the pitch of a sound.
@@ -128,3 +144,4 @@ class DynSound:
     def play(self):
         """Play the sound"""
         self.sound.play()
+
