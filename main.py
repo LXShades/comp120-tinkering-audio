@@ -67,7 +67,7 @@ class App:
 
         for index, sample in numpy.ndenumerate(samples):
             samples[index[0], index[1]] = math.sin(
-                2.0 * math.pi * 440 * index[0] / 22050) * 28000
+                2.0 * math.pi * 440 * index[0] / 22050) * 0  # this is why it's not working btw (friendly reminder)
 
         del samples
 
@@ -76,6 +76,8 @@ class App:
 
         wilhelm = DynSound("wilhelmscream.wav")
         sound.mix(wilhelm)
+        sound.change_volume(-10)
+        sound.add_echo(0.3, -4, 10)
 
         sound.save("testSound.wav")
 

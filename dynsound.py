@@ -49,6 +49,18 @@ class DynSound:
             self.num_channels = num_channels
             self.sample_rate = sample_rate
 
+    def copy(self):
+        """Creates and returns a copy of this sound
+
+             Returns: (Sound) The copy
+        """
+        samples = pygame.sndarray.samples(self.sound)
+
+        new_sound = DynSound(num_channels=self.num_channels, num_frames=samples.shape[0], sample_rate=self.sample_rate)
+        new_sound.sound = pygame.mixer.Sound(samples)
+
+        return new_sound
+
     def save(self, file_name):
         """
         Saves a sound to disk.
@@ -73,21 +85,56 @@ class DynSound:
 
         saved_sound.close()
 
-    def mix(self, sound2):
-        # Create a copy of the samples so we can resize them
+    def mix(self, source, target_start=0.0, source_start=0.0, length=-1):
+        """Mixes this sound with another
+
+        Args:
+            source (DynSound): Sound to mix with
+            target_start (float in seconds): Time, in this sound, to start mixing at
+            source_start (float in seconds): Time, in sound2, to start the mix
+            length (float in seconds): Length of the sound section being mixed.
+                                       -1 will use the length of the source sound
+        """
+        # Load the source samples
+        source_samples = pygame.sndarray.array(source.sound)
+
+        # Determine frame boundaries for mix
+        target_start_frame = int(target_start * self.sample_rate)
+        source_start_frame = int(source_start * self.sample_rate)
+        num_frames = int(length * self.sample_rate)
+        num_channels = 2  # TODO
+
+        if source_start_frame + num_frames >= source_samples.shape[0] or length == -1:
+            num_frames = source_samples.shape[0] - source_start_frame
+
+        # Load the target (self) samples
         sample_array = pygame.sndarray.array(self.sound)
-        sample_array2 = pygame.sndarray.array(sound2.sound)
 
-        min_length = min(sample_array.shape[0], sample_array2.shape[0])
+        if sample_array.shape[0] < target_start_frame + num_frames:
+            sample_array.resize((target_start_frame + num_frames, sample_array.shape[1]))
 
-        for frame in xrange(0, min_length):
-            sample_array[frame, 0] = (sample_array[frame, 0] + sample_array2[frame, 0])
+        # Mix the sounds!
+        for frame in xrange(0, num_frames):
+            # TODO: handle clipping
+            # TODO: further consideration--mixing mono with stereo sounds
+            for channel in xrange(0, num_channels):
+                sample_array[target_start_frame + frame, channel] += source_samples[source_start_frame + frame, channel]
 
+        # Copy the data back into this sound
         self.sound = pygame.mixer.Sound(sample_array)
 
     def add_echo(self, delay, volume_change, num_echoes):
-        pass
-
+        """Adds an echo to the sound
+        Args:
+            delay (float): Delay of each echo, in seconds
+            volume_change (float): Reduction of volume per echo, in dB
+            num_echoes (int): Number of echoes
+        """
+        original_sound = self.copy()
+        for i in xrange(0, num_echoes):
+            shut_up = original_sound.copy()
+            shut_up.change_volume(volume_change * (i + 1))
+            self.mix(shut_up, delay * (i + 1))
 
     def change_frequency(self,  multiplier):
         """
