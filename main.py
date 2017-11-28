@@ -31,19 +31,33 @@ class App:
     def __init__(self):
         """Class constructor"""
 
+        # Just call run and be done!
         self.run()
 
     def run(self):
-        """Run the application."""
+        """Runs the application."""
 
+        # Initialise PyGame
         pygame.init()
         pygame.mixer.init(frequency=self.FREQUENCY, size=self.SIZE, channels=self.CHANNELS, buffer=self.BUFFER)
 
-        self.screen = pygame.display.set_mode(
-            (640, 481))  # 481 for extra uniqueness points
+        self.screen = pygame.display.set_mode((640, 481))  # 481 for extra uniqueness points
 
-        self.create_sine()
+        # Generate a test sound with effects
+        sound = self.create_sine(440, 1.0)
+        sound.change_frequency(0.5)
+        sound.change_volume(-0)
 
+        wilhelm = DynSound("wilhelmscream.wav")
+        sound.mix(wilhelm)
+        sound.change_volume(-10)
+        sound.add_echo(0.3, -4, 10)
+
+        sound.save("testSound.wav")
+
+        sound.play()
+
+        # Run the main loop
         self.running = True
         while self.running:
             for event in pygame.event.get():
@@ -59,29 +73,24 @@ class App:
 
         self.running = False
 
-    def create_sine(self):
-        """Creates an empty sound wave from the wilhelmScream (The origin of all life)"""
-        sound = DynSound(num_frames=22050)
-        #sound = DynSound(num_frames=22050)
+    def create_sine(self, frequency, length):
+        """Creates a sine wave
+
+        Args:
+            frequency (int): Frequency of the sine wave in hZ
+            length (float): Length of the sine wave in seconds
+        Returns:
+            (DynSound) A sine wave
+        """
+        sound = DynSound(num_frames=int(length * 22050))
         samples = pygame.sndarray.samples(sound.sound)
 
         for index, sample in numpy.ndenumerate(samples):
-            samples[index[0], index[1]] = math.sin(
-                2.0 * math.pi * 440 * index[0] / 22050) * 0  # this is why it's not working btw (friendly reminder)
+            samples[index[0], index[1]] = math.sin(2.0 * math.pi * frequency * index[0] / 22050)
 
         del samples
 
-        sound.change_frequency(0.5)
-        sound.change_volume(-10)
-
-        wilhelm = DynSound("wilhelmscream.wav")
-        sound.mix(wilhelm)
-        sound.change_volume(-10)
-        sound.add_echo(0.3, -4, 10)
-
-        sound.save("testSound.wav")
-
-        sound.play()
+        return sound
 
 # Main code run!
 App()

@@ -32,20 +32,21 @@ class DynSound:
                 sample_rate: Sample rate of sound
                 data_type: Type of data for samples. Usually signed 2-byte int
         """
+
+        # Load a file if a filename was provided
         if load_file:
             self.sound = pygame.mixer.Sound(load_file)
             self.num_channels = 2  # TO FIX
             self.sample_rate = 22050  # ALSO TO FIX LOL
 
             if self.sound.get_length() <= 0.1:
-                # Assume load failed
+                # Assume that the load failed
                 del self.sound
                 self.sound = None
 
         # If no sound was provided or loaded, create an empty sound
         if self.sound is None:
-            self.sound = pygame.mixer.Sound(
-                numpy.ndarray(shape=(num_frames, num_channels), dtype=data_type))
+            self.sound = pygame.mixer.Sound(numpy.ndarray(shape=(num_frames, num_channels), dtype=data_type))
             self.num_channels = num_channels
             self.sample_rate = sample_rate
 
@@ -70,10 +71,11 @@ class DynSound:
         """
         samples = pygame.sndarray.samples(self.sound)
 
+        # Create/open WAV
         saved_sound = wave.open(file_name, "w")
-        saved_sound.setparams((samples.shape[1], self.num_channels,
-                               self.sample_rate, samples.shape[0], "NONE", ""))
+        saved_sound.setparams((samples.shape[1], self.num_channels, self.sample_rate, samples.shape[0], "NONE", ""))
 
+        # Write samples to WAV
         sample_values = []
 
         for index, sample in numpy.ndenumerate(samples):
@@ -83,6 +85,7 @@ class DynSound:
         value_string = "".join(sample_values)
         saved_sound.writeframes(value_string)
 
+        # Done!
         saved_sound.close()
 
     def mix(self, source, target_start=0.0, source_start=0.0, length=-1):
@@ -98,7 +101,7 @@ class DynSound:
         # Load the source samples
         source_samples = pygame.sndarray.array(source.sound)
 
-        # Determine frame boundaries for mix
+        # Determine the frame max and min boundaries for both sounds
         target_start_frame = int(target_start * self.sample_rate)
         source_start_frame = int(source_start * self.sample_rate)
         num_frames = int(length * self.sample_rate)
@@ -124,7 +127,9 @@ class DynSound:
         self.sound = pygame.mixer.Sound(sample_array)
 
     def add_echo(self, delay, volume_change, num_echoes):
-        """Adds an echo to the sound
+        """
+        Adds an echo to the sound
+
         Args:
             delay (float): Delay of each echo, in seconds
             volume_change (float): Reduction of volume per echo, in dB
@@ -141,48 +146,41 @@ class DynSound:
         Change the pitch of a sound.
 
         Args:
-            sound (pygame.mixer.Sound): The sound to be altered.
             multiplier (float): The multiplier to be applied to the sound's frequency.
         """
         # Create a copy of the samples so we can resize them
         sample_array = pygame.sndarray.array(self.sound)
 
         if multiplier > 1.0:
-            # Increase frequency
+            # Increase frequency (shift down samples from later on in the array)
             for index, sample in numpy.ndenumerate(sample_array):
                 if int(index[0] * multiplier) >= sample_array.shape[0]:
                     break
                 else:
-                    sample_array[index[0], index[1]] = sample_array[
-                        int(index[0] * multiplier), index[1]]
+                    sample_array[index[0], index[1]] = sample_array[int(index[0] * multiplier), index[1]]
 
-            sample_array.resize((
-                int(math.ceil(sample_array.shape[0] / float(multiplier))),
-                int(sample_array.shape[1])))
+            sample_array.resize((int(math.ceil(sample_array.shape[0] / float(multiplier))), int(sample_array.shape[1])))
         elif multiplier < 1.0:
-            # Decrease frequency
-            sample_array.resize((
-                int(math.ceil(sample_array.shape[0] / float(multiplier))),
-                int(sample_array.shape[1])))
+            # Decrease frequency (stretch out samples from earlier on in the array)
+            sample_array.resize((int(math.ceil(sample_array.shape[0] / float(multiplier))), int(sample_array.shape[1])))
 
             for frame in xrange(sample_array.shape[0] - 1, 0, -1):
                 for channel in xrange(sample_array.shape[1]):
-                    sample_array[frame, channel] = \
-                        sample_array[int(frame * multiplier), channel]
+                    sample_array[frame, channel] = sample_array[int(frame * multiplier), channel]
 
-        # Update the length of sound by copying data
-        # (super efficient as always)
+        # Update the length of sound by recreating it (seems to be the only way to resize a sound)
         self.sound = pygame.mixer.Sound(sample_array)
 
     def change_volume(self, db):
         """
         Change the volume of a sound.
 
-        sound (pygame.mixer.Sound): The sound to alter.
-        db (float): Decibels to change sound volume by.
+        Args:
+            db (float): Decibels to change sound volume by.
         """
         sample_array = pygame.sndarray.samples(self.sound)
 
+        # Multiply all samples according to the db given
         multiplier = pow(10, float(db) / 20)
         for index, sample in numpy.ndenumerate(sample_array):
             # Todo limits checking (clipping)
