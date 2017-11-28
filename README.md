@@ -28,3 +28,17 @@ a pickup, jump, death and laser.
 
 * **Potential sound types** Sine wave, saw wave, square wave, more?
 * **Potential filters types** Pitch, volume, clip, combine, reverse, more?
+
+## Plan of action!!!
+
+* Add a user interface  
+* Basic window  
+* Button to save sound  
+* Add sliders to adjust volume, frequency and number of echoes  
+* Twist! Sliders are all done in colours. For creatvity   
+* Small colour box to show the colour of the sound
+
+## Added Bonus Stuff!
+
+* Funny reactions to your colours
+* Image and pseudo random text
