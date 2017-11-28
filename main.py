@@ -40,6 +40,8 @@ class App:
     frequency_change = 0  # in multiplier per second (TODO)
     echo_count = 0  # Number of echoes
 
+    volume_slider = None
+
     def __init__(self):
         """Class constructor"""
 
@@ -93,6 +95,10 @@ class App:
         volume_up = Tkinter.Button(self.main_screen, text="Volume Up", command=lambda: self.change_volume(10))
         volume_down = Tkinter.Button(self.main_screen, text="Volume Down", command=lambda: self.change_volume(-10))
 
+        self.volume_slider = Tkinter.Scale(self.main_screen, troughcolor="#ff0000", orient=Tkinter.HORIZONTAL, from_=0, to=100, command=lambda v: self.change_volume(float(v) - 100)) # TODO: Fix clipping when increasing volume for greater range
+        self.volume_slider.set(50)
+        self.volume_slider.pack()
+
         top_frame.pack()
         volume_up.pack()
         volume_down.pack()
@@ -115,8 +121,8 @@ class App:
 
         # Generate a test sound with effects
         # self.edit_sound.play()
-        self.edit_sound.change_frequency(0.5)
-        self.edit_sound.change_volume(-0)
+        # self.edit_sound.change_frequency(0.5)
+        # self.edit_sound.change_volume(-0)
 
         wilhelm = DynSound("wilhelmscream.wav")
         self.edit_sound.mix(wilhelm)
@@ -130,13 +136,18 @@ class App:
 
         self.running = False
 
-    def change_volume(self, offset):
+    def change_volume(self, new_volume):
         """Decreases the volume by offset
 
         Args:
-            offset (float): The offset to increase (or decrease) volume by
+            new_volume (float): The offset to increase (or decrease) volume by.
         """
-        self.volume += offset
+
+        # Change colour of slider when volume is changed.
+        new_colour = "#" + str(format((int(new_volume) + 100) * 255 / 100, "02x")) + "0000"
+
+        self.volume = new_volume
+        self.volume_slider.config(troughcolor=new_colour)
         self.sound_needs_updating = True
 
     def create_sine(self, frequency, length):
