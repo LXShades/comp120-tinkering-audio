@@ -12,10 +12,10 @@ class Generator:
     Variables and functions for app.
 
     Attributes:
-        FREQUENCY (int): Frequency of sound.
-        SIZE (int): Size of sound in bits.
-        CHANNELS (int): Number of channels.
-        BUFFER (int): Size of buffer.
+        mixer_sample_rate (int): Sample rate of mixer.
+        mixer_sample_size (int): Size of sound samples in bits (negative if signed, positive if unsigned, blame pygame).
+        mixer_num_channels (int): Number of sound channels in mixer.
+        mixer_buffer_size (int): Size of mixer buffer.
 
         edit_sound (DynSound): Sound after edits have been applied
         base_sound (DynSound): Original sound before edits are applied
@@ -28,10 +28,10 @@ class Generator:
         plops_per_second (int): Plop effect for sounds
     """
 
-    FREQUENCY = 22050
-    SIZE = -16
-    CHANNELS = 2
-    BUFFER = 4096
+    mixer_sample_rate = 22050
+    mixer_sample_size = -16
+    mixer_num_channels = 2
+    mixer_buffer_size = 4096
 
     edit_sound = None
     base_sound = None
@@ -48,9 +48,19 @@ class Generator:
     frequency_slider = None
     echo_slider = None
 
-    def __init__(self, frequence, size, channels, buffer):
-        """Initialises sound generator with a base sine wave"""
+    def __init__(self, sample_rate, sample_size, num_channels, buffer_size):
+        """
+        Initialises sound generator with a base sine wave
 
+        Args:
+            sample_rate (int): Sample rate of mixer. Must match pygame.mixer initialisation properties.
+
+        """
+
+        self.mixer_sample_rate = sample_rate
+        self.mixer_buffer_size = buffer_size
+        self.mixer_num_channels = num_channels
+        self.mixer_buffer_size = buffer_size
         self.base_sound = self.create_sine(440, 1.0)
 
     def play_sound(self):
@@ -167,12 +177,16 @@ class Generator:
 
         sound = DynSound(num_frames=int(length * 22050))
         samples = pygame.sndarray.samples(sound.sound)
+
         minimum_value = sound.sample_min
         maximum_value = sound.sample_max
+        centre_value = (minimum_value + maximum_value) / 2
+        sample_range = sound.sample_max - centre_value
 
         for index, sample in numpy.ndenumerate(samples):
-            samples[index[0], index[1]] = math.sin(2.0 * math.pi * frequency * index[0] / 22050) * sound.sample_range
+            samples[index[0], index[1]] = centre_value + math.sin(2.0 * math.pi * frequency * index[0] / 22050) * sample_range
 
         del samples
 
         return sound
+    
