@@ -110,7 +110,6 @@ class App:
         pygame.init()
         pygame.mixer.init(frequency=self.FREQUENCY, size=self.SIZE, channels=self.CHANNELS, buffer=self.BUFFER)
 
-        # self.screen = pygame.display.set_mode((640, 481))  # 481 for extra uniqueness points
 
         # Initialise a base sine wave
         self.base_sound = self.create_sine(440, 1.0)
