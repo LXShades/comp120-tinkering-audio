@@ -8,6 +8,16 @@ You are currently been tasked with creating a tool which will generate sound
 effects, the target for these sounds in an 8-bit style game. You have to generate
 a pickup, jump, death and laser.
 
+## User Manual
+
+This simple tool can be used to create basic sounds. Use the sliders to change the properties of the sound, and the Play button
+to preview it. The Save button can be used to save your sound as a .wav file when you are finished.  
+
+Using the preset sound buttons will automatically move the sliders to create the preset sounds.  
+
+What do the sliders do you ask? Easy, they change the colour of your sound! More yello, red, white, blue and purpleness!
+No. We won't be serious. We are being creative.
+
 ## Requirements
 
 * **Generate Sounds** Generate four sounds. Pickup, jump, death and laser.
