@@ -37,16 +37,12 @@ class Generator:
     base_sound = None
     sound_valid = False
 
+    sound_length = 1
     volume = 0  # Volume offset
     frequency = 1  # Frequency multiplier
     frequency_shift = 0  # in multiplier per second (TODO)
     echo_count = 0  # Number of echoes
     plops_per_second = 0
-
-    # User interface
-    volume_slider = None
-    frequency_slider = None
-    echo_slider = None
 
     def __init__(self, sample_rate, sample_size, num_channels, buffer_size):
         """
@@ -60,7 +56,7 @@ class Generator:
         self.mixer_sample_rate = sample_rate
         self.mixer_buffer_size = buffer_size
         self.mixer_num_channels = num_channels
-        self.mixer_buffer_size = buffer_size
+        self.mixer_sample_size = sample_size
         self.base_sound = self.create_sine(440, 1.0)
 
     def play_sound(self):
@@ -88,7 +84,7 @@ class Generator:
             return
 
         # Regenerate the 2-second A4 base sine wave (note: in a stretch-goal version the user could select the base sound)
-        self.base_sound = self.create_sine(440, self.frequency)  # self.frequency is used to rebalance the length of the final sound before change_frequency is called
+        self.base_sound = self.create_sine(440, self.frequency * self.sound_length)  # self.frequency is used to rebalance the length of the final sound before change_frequency is called
 
         # Recopy the base sound
         self.edit_sound = self.base_sound.copy()

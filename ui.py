@@ -49,6 +49,7 @@ class UI:
 
     title_text = None
 
+    length_slider = None
     volume_slider = None
     frequency_slider = None
     frequency_shift_slider = None
@@ -96,30 +97,34 @@ class UI:
         self.save_sound = Tkinter.Button(self.button_parent, height=self.BUTTON_HEIGHT, width=self.BUTTON_WIDTH * 2, text="Save Sound")
         self.save_sound.grid(row=1, column=2, columnspan=2, sticky=Tkinter.E)
 
+        # Sound length slider
+        self.length_slider = Tkinter.Scale(self.slider_parent, length=self.SLIDER_WIDTH, width=self.SLIDER_HEIGHT, troughcolor="#00FF00", orient=Tkinter.HORIZONTAL, from_=1, to=10, showvalue=True)
+        self.length_slider.grid(row=3, columnspan=4)
+
         # Volume slider
         self.volume_slider = Tkinter.Scale(self.slider_parent, length=self.SLIDER_WIDTH, width=self.SLIDER_HEIGHT, troughcolor="#FFFF00", orient=Tkinter.HORIZONTAL, from_=0, to=100, showvalue=True)
         self.volume_slider.set(100)
-        self.volume_slider.grid(row=3, columnspan=4)
+        self.volume_slider.grid(row=4, columnspan=4)
 
         # Frequency slider
         self.frequency_slider = Tkinter.Scale(self.slider_parent, length=self.SLIDER_WIDTH, width=self.SLIDER_HEIGHT, troughcolor="#000000", orient=Tkinter.HORIZONTAL, from_=0.1, to=5.0, resolution=0.1, showvalue=True)
         self.frequency_slider.set(1)
-        self.frequency_slider.grid(row=4, columnspan=4)
+        self.frequency_slider.grid(row=5, columnspan=4)
 
         # Frequency shift slider
         self.frequency_shift_slider = Tkinter.Scale(self.slider_parent, length=self.SLIDER_WIDTH, width=self.SLIDER_HEIGHT, troughcolor="#ff0000", orient=Tkinter.HORIZONTAL, from_=0, to=5.0, resolution=0.1, showvalue=True)
         self.frequency_shift_slider.set(0)
-        self.frequency_shift_slider.grid(row=5, columnspan=4)
+        self.frequency_shift_slider.grid(row=6, columnspan=4)
 
         # Plop slider
         self.plop_slider = Tkinter.Scale(self.slider_parent, length=self.SLIDER_WIDTH, width=self.SLIDER_HEIGHT, troughcolor="#0000ff", orient=Tkinter.HORIZONTAL, from_=0, to=100, resolution=1, showvalue=True)
         self.plop_slider.set(0)
-        self.plop_slider.grid(row=6, columnspan=4)
+        self.plop_slider.grid(row=7, columnspan=4)
 
         # Echo slider
         self.echo_slider = Tkinter.Scale(self.slider_parent, length=self.SLIDER_WIDTH, width=self.SLIDER_HEIGHT, troughcolor="#800080", orient=Tkinter.HORIZONTAL, from_=0, to=10, showvalue=True)
         self.echo_slider.set(0)
-        self.echo_slider.grid(row=7, columnspan=4)
+        self.echo_slider.grid(row=8, columnspan=4)
 
     def death_preset(self):
         """Sets sliders to presets for death sound."""

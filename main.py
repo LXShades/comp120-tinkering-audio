@@ -54,6 +54,9 @@ class App:
         self.ui.play_preview.config(command=lambda: self.generator.play_sound())
         self.ui.save_sound.config(command=lambda: self.generator.save_sound())
 
+        # Length slider
+        self.ui.length_slider.config(command=lambda  value: self.on_slider_change(self.ui.length_slider, value))
+
         # Volume slider
         self.ui.volume_slider.config(command=lambda value: self.on_slider_change(self.ui.volume_slider, value)) # TODO: Fix clipping when increasing volume for greater range
 
@@ -81,7 +84,12 @@ class App:
             value (string): The value of the slider as provided by Tkinter
         """
         # Update sliders and change their colours on a per-slider basis
-        if slider == self.ui.volume_slider:
+
+        if slider == self.ui.length_slider:
+            self.generator.sound_length = float(value)
+            self.generator.sound_valid = False
+
+        elif slider == self.ui.volume_slider:
             new_volume = float(value)
             self.generator.change_volume(new_volume - 100)
 
