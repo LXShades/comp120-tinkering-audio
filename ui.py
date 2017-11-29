@@ -64,8 +64,10 @@ class UI:
         self.pickup_preset_button = Tkinter.Button(top_frame, text="Pickup Sound", command=lambda: self.pickup_preset())
         self.pickup_preset_button.pack(side=Tkinter.RIGHT)
 
-        # Play/Save buttons
+        self.laser_preset_button = Tkinter.Button(top_frame, text="Laser Sound", command=lambda: self.pickup_preset())
+        self.laser_preset_button.pack(side=Tkinter.RIGHT)
 
+        # Play/Save buttons
         self.play_preview = Tkinter.Button(top_frame, text="Play Sound")
         self.play_preview.pack(side=Tkinter.LEFT)
         self.save_sound = Tkinter.Button(top_frame, text="Save Sound")
@@ -82,8 +84,8 @@ class UI:
         self.frequency_slider.pack()
 
         # Frequency shift slider
-        self.frequency_shift_slider = Tkinter.Scale(self.main_screen, troughcolor="#ff0000", orient=Tkinter.HORIZONTAL, from_=0.1, to=5.0, resolution=0.1, showvalue=True)
-        self.frequency_shift_slider.set(1)
+        self.frequency_shift_slider = Tkinter.Scale(self.main_screen, troughcolor="#ff0000", orient=Tkinter.HORIZONTAL, from_=0, to=5.0, resolution=0.1, showvalue=True)
+        self.frequency_shift_slider.set(0)
         self.frequency_shift_slider.pack()
 
         # Plop slider
@@ -99,28 +101,28 @@ class UI:
         top_frame.pack()
 
     def death_preset(self):
-        """Slider presets for death sound."""
+        """Sets sliders to presets for death sound."""
         self.frequency_slider.set(2)
         self.frequency_shift_slider.set(0)
         self.plop_slider.set(4)
         self.echo_slider.set(4)
 
     def pickup_preset(self):
-        """Slider presets for pickup sound."""
+        """Sets sliders to presets for pickup sound."""
         self.frequency_slider.set(3)
         self.frequency_shift_slider.set(3)
         self.plop_slider.set(28)
         self.echo_slider.set(0)
 
     def jump_preset(self):
-        """Slider presets for jump sound."""
+        """Sets sliders to presets for jump sound."""
         self.frequency_slider.set(2)
         self.frequency_shift_slider.set(3)
         self.plop_slider.set(0)
         self.echo_slider.set(0)
 
     def laser_preset(self):
-        """Slider presets for laser sound."""
+        """Sets sliders to presets for laser sound."""
         pass
 
     def change_slider_colour(self, slider, (red, green, blue)):

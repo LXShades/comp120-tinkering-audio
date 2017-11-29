@@ -50,9 +50,6 @@ class App:
         pygame.init()
         pygame.mixer.init(frequency=self.FREQUENCY, size=self.SIZE, channels=self.CHANNELS, buffer=self.BUFFER)
 
-        # Initialise a base sine wave
-        #self.base_sound = self.create_sine(440, 1.0)
-
         # Initialise ui and generator
         self.generator = Generator()
         self.ui = UI()
@@ -76,24 +73,8 @@ class App:
         # Plop slider
         self.ui.plop_slider.config(command=lambda value: self.on_slider_change(self.ui.plop_slider, value))
 
+        # Begin main UI loop
         self.ui.main_screen.mainloop()
-
-        # TODO testing new ui
-        #self.main_screen = Tkinter.Tk()
-        #self.init_ui()
-        #self.main_screen.mainloop()
-
-        # Generate a test sound with effects
-        # self.edit_sound.play()
-        # self.edit_sound.change_frequency(0.5)
-        # self.edit_sound.change_volume(-0)
-
-        wilhelm = DynSound("wilhelmscream.wav")
-        # self.edit_sound.mix(wilhelm)
-        # self.edit_sound.change_volume(-10)
-        # self.edit_sound.add_echo(0.3, -4, 10)
-
-        # self.edit_sound.save("testSound.wav")
 
     def on_slider_change(self, slider, value):
         """Callback function called by the UI when one of the sliders changes

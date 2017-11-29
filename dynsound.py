@@ -124,7 +124,7 @@ class DynSound:
             # TODO: handle clipping
             # TODO: further consideration--mixing mono with stereo sounds
             for channel in xrange(0, num_channels):
-                sample_array[target_start_frame + frame, channel] = numpy.clip(sample_array[target_start_frame + frame, channel] + source_samples[source_start_frame + frame, channel],
+                sample_array[target_start_frame + frame, channel] = numpy.clip(int(sample_array[target_start_frame + frame, channel]) + source_samples[source_start_frame + frame, channel],
                                                                                -self.sample_range, self.sample_range)
 
         # Copy the data back into this sound
@@ -232,10 +232,10 @@ class DynSound:
         # Produce plop effect
         sample_array = pygame.sndarray.samples(self.sound)
 
-        high_index = 22050 / plopper_rate
+        high_index = self.sample_rate / plopper_rate / 2
         length = sample_array.shape[0]
         while high_index < length:
-            section_end = high_index + 22050 / plopper_rate
+            section_end = high_index + self.sample_rate / plopper_rate / 2
 
             if section_end > length:
                 section_end = length
@@ -244,7 +244,7 @@ class DynSound:
                 for channel in xrange(0, self.num_channels):
                     sample_array[low_index, channel] = 0
 
-            high_index += (22050 / plopper_rate) * 2
+            high_index += self.sample_rate / plopper_rate
 
 
     def play(self):

@@ -47,7 +47,7 @@ class Generator:
     echo_slider = None
 
     def __init__(self):
-        """Initialises self"""
+        """Initialises sound generator with a base sine wave"""
         self.base_sound = self.create_sine(440, 1.0)
 
     def play_sound(self):
@@ -74,13 +74,13 @@ class Generator:
         # Recopy the base sound
         self.edit_sound = self.base_sound.copy()
 
-        # Apply effects in an order which hopefully minimises clipping: volume, frequency, echoes
+        # Apply effects in an order which hopefully minimises clipping: volume, frequency, plops, echoes
         if self.volume is not 0:
             self.edit_sound.change_volume(self.volume)
 
         if self.frequency is not 1.0 and self.frequency_shift is 0.0:
             self.edit_sound.change_frequency(self.frequency)
-        elif self.frequency is not 1.0 or self.frequency_shift is not 0.0:
+        elif self.frequency_shift is not 0.0:
             self.edit_sound.change_frequency_shifting(self.frequency, self.frequency_shift)
 
         if self.plops_per_second > 0:
