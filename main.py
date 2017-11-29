@@ -18,6 +18,7 @@ class App:
         SIZE (int): Size of sound in bits.
         CHANNELS (int): Number of channels.
         BUFFER (int): Size of buffer.
+        SAMPLE_RANGE (int): Approximate min and max range of sound samples
 
         main_screen (Tkinter.Tk): The main application screen.
         running (bool): If the program is running or not.
@@ -27,6 +28,7 @@ class App:
     SIZE = -16
     CHANNELS = 2
     BUFFER = 4096
+    SAMPLE_RANGE = 32767
 
     main_screen = None
     running = False
@@ -98,17 +100,17 @@ class App:
         save_sound.pack(side=Tkinter.LEFT)
 
         # Volume slider
-        self.volume_slider = Tkinter.Scale(self.main_screen, troughcolor="#ff0000", orient=Tkinter.HORIZONTAL, from_=0, to=100, command=lambda v: self.change_volume(float(v) - 100)) # TODO: Fix clipping when increasing volume for greater range
+        self.volume_slider = Tkinter.Scale(self.main_screen, troughcolor="#ff0000", orient=Tkinter.HORIZONTAL, from_=0, to=100, showvalue=False, command=lambda v: self.change_volume(float(v) - 100)) # TODO: Fix clipping when increasing volume for greater range
         self.volume_slider.set(50)
         self.volume_slider.pack()
 
         # Frequency slider
-        self.frequency_slider = Tkinter.Scale(self.main_screen, troughcolor="#ff0000", orient=Tkinter.HORIZONTAL, from_=0.1, to=5.0, resolution=0.1, command=lambda v: self.change_frequency(float(v)))
+        self.frequency_slider = Tkinter.Scale(self.main_screen, troughcolor="#ff0000", orient=Tkinter.HORIZONTAL, from_=0.1, to=5.0, resolution=0.1, showvalue=False, command=lambda v: self.change_frequency(float(v)))
         self.frequency_slider.set(1)
         self.frequency_slider.pack()
 
         # Echo slider
-        self.echo_slider = Tkinter.Scale(self.main_screen, troughcolor="#0000ff", orient=Tkinter.HORIZONTAL, from_=0, to=10, command=lambda v: self.change_echoes(int(v)))
+        self.echo_slider = Tkinter.Scale(self.main_screen, troughcolor="#0000ff", orient=Tkinter.HORIZONTAL, from_=0, to=10, showvalue=False, command=lambda v: self.change_echoes(int(v)))
         self.echo_slider.set(0)
         self.echo_slider.pack()
 
@@ -154,12 +156,10 @@ class App:
         """
 
         # Change colour of slider when volume is changed (white to black)
-        normalised_volume = int((new_volume + 100) * 255 / 100)
-        new_colour = "#" + format(0xFFFFFF - normalised_volume - (normalised_volume << 8) - (normalised_volume << 16), "06x")
-
         self.volume = new_volume
-        self.volume_slider.config(troughcolor=new_colour)
         self.sound_valid = False
+
+        self.change_slider_colour(self.volume_slider, (int(new_volume + 100) * 255 / 100, int(new_volume + 100) * 255 / 100, 0))
 
     def change_frequency(self, frequency_multiplier):
         """Sets the frequency of the main edited sound
@@ -167,11 +167,11 @@ class App:
         Args:
             frequency_multiplier (float): The new multiplier for the sound frequency
         """
-        new_colour = "#" + format(int(frequency_multiplier * 255 / 5), "02x") + "0000"
-
         self.frequency = frequency_multiplier
-        self.frequency_slider.config(troughcolor=new_colour)
         self.sound_valid = False
+
+        # Make slider SUPA FAST!!
+        self.change_slider_colour(self.frequency_slider, (int(frequency_multiplier * 255 / 5), 0, 0))
 
     def change_echoes(self, echo_num):
         """Set the number of echoes.
@@ -180,12 +180,27 @@ class App:
             echo_num (int): Number of echoes to add.
         """
 
-        #new_colour = "#" + format(0x800080 + echo_num, "02x") + "0000"
-        new_colour = "#0000FF"
-
         self.echo_count = echo_num
-        self.echo_slider.config(troughcolor=new_colour)
         self.sound_valid = False
+
+        # Make slider da sneakistz purppl
+        self.change_slider_colour(self.echo_slider, (0x80 + int(echo_num) * 0x7F / 10, 0, 0x80 + int(echo_num) * 0x7F / 10))
+
+    def change_slider_colour(self, slider, (red, green, blue)):
+        """Changes the colour of a slider by a red, green and blue value
+
+        Args:
+            slider (Tkinter.Scale): Tkinter slider object whose colour will be changed
+            (red, green, blue) (int): Colour components between 0 and 255 (0x00-0xFF)
+        """
+
+        # Convert and clip colour values
+        red = numpy.clip(int(red), 0, 0xFF)
+        green = numpy.clip(int(green), 0, 0xFF)
+        blue = numpy.clip(int(blue), 0, 0xFF)
+
+        # Update slider
+        slider.config(troughcolor="#" + format(int(blue | (green << 8) | (red << 16)), "06x"))
 
     def create_sine(self, frequency, length):
         """Creates a sine wave
@@ -200,7 +215,7 @@ class App:
         samples = pygame.sndarray.samples(sound.sound)
 
         for index, sample in numpy.ndenumerate(samples):
-            samples[index[0], index[1]] = math.sin(2.0 * math.pi * frequency * index[0] / 22050) * 32767
+            samples[index[0], index[1]] = math.sin(2.0 * math.pi * frequency * index[0] / 22050) * self.SAMPLE_RANGE
 
         del samples
 

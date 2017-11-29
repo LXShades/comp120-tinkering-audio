@@ -121,7 +121,7 @@ class DynSound:
             # TODO: handle clipping
             # TODO: further consideration--mixing mono with stereo sounds
             for channel in xrange(0, num_channels):
-                sample_array[target_start_frame + frame, channel] += source_samples[source_start_frame + frame, channel]
+                sample_array[target_start_frame + frame, channel] = numpy.clip(sample_array[target_start_frame + frame, channel] + source_samples[source_start_frame + frame, channel], -32767, 32767)
 
         # Copy the data back into this sound
         self.sound = pygame.mixer.Sound(sample_array)
@@ -184,7 +184,7 @@ class DynSound:
         multiplier = pow(10, float(db) / 20)
         for index, sample in numpy.ndenumerate(sample_array):
             # Todo limits checking (clipping)
-            sample_array[index[0], index[1]] *= multiplier
+            sample_array[index[0], index[1]] = numpy.clip(sample_array[index[0], index[1]] * multiplier, -32767, 32767)
 
     def play(self):
         """Play the sound"""
