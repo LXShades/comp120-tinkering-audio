@@ -51,6 +51,11 @@ class UI:
         self.frequency_shift_slider.set(1)
         self.frequency_shift_slider.pack()
 
+        # Plop slider
+        self.plop_slider = Tkinter.Scale(self.main_screen, troughcolor="#0000ff", orient=Tkinter.HORIZONTAL, from_=0, to=100, resolution=1, showvalue=False)
+        self.plop_slider.set(1)
+        self.plop_slider.pack()
+
         # Echo slider
         self.echo_slider = Tkinter.Scale(self.main_screen, troughcolor="#800080", orient=Tkinter.HORIZONTAL, from_=0, to=10, showvalue=False)
         self.echo_slider.set(0)

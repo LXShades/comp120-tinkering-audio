@@ -39,6 +39,7 @@ class Generator:
     frequency = 1  # Frequency multiplier
     frequency_shift = 0  # in multiplier per second (TODO)
     echo_count = 0  # Number of echoes
+    plops_per_second = 0
 
     # User interface
     volume_slider = None
@@ -87,6 +88,9 @@ class Generator:
         elif self.frequency is not 1.0 or self.frequency_shift is not 0.0:
             self.edit_sound.change_frequency_shifting(self.frequency, self.frequency_shift)
 
+        if self.plops_per_second > 0:
+            self.edit_sound.add_plopper(self.plops_per_second)
+
         if self.echo_count > 0:
             self.edit_sound.add_echo(0.3, -4, self.echo_count)
 
@@ -130,6 +134,14 @@ class Generator:
         """
 
         self.echo_count = echo_num
+        self.sound_valid = False
+
+    def change_plopper(self, plops_per_second):
+        """Sets plops per second
+
+        Args:
+            plops_per_second (float): Number of plops per second (sound effect)"""
+        self.plops_per_second = plops_per_second
         self.sound_valid = False
 
     def create_sine(self, frequency, length):
