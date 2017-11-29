@@ -159,7 +159,7 @@ class DynSound:
 
     def add_echo(self, delay, volume_change, num_echoes):
         """
-        Adds an echo to the sound
+        Adds an echo to the sound.
 
         Args:
             delay (float): Delay of each echo, in seconds
@@ -248,7 +248,7 @@ class DynSound:
 
     def add_plopper(self, plopper_rate):
         """
-        Adds plop effect
+        Adds 'plop' effect. Plop effect is a stutter/on-off effect.
 
         Args:
              plopper_rate (float): Number of plops per second

@@ -21,8 +21,6 @@ class App:
         CHANNELS (int): Number of channels.
         BUFFER (int): Size of buffer.
 
-        running (bool): If the program is running or not.
-
         generator (Generator): App sound generator
         ui (UI): App user interface
     """
@@ -31,8 +29,6 @@ class App:
     SIZE = -16
     CHANNELS = 2
     BUFFER = 4096
-
-    running = False
 
     generator = None
     ui = None
@@ -107,11 +103,6 @@ class App:
             self.ui.change_slider_colour(self.ui.frequency_shift_slider, (255, 255, 255))
         elif slider == self.ui.plop_slider:
             self.generator.change_plopper(float(value))
-
-    def quit(self):
-        """Quits the application"""
-
-        self.running = False
 
 # Main code run!
 App()

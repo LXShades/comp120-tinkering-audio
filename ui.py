@@ -51,7 +51,7 @@ class UI:
     frequency_slider = None
     frequency_shift_slider = None
     echo_slider = None
-    plop_slider = None  # TODO: Not per second for some reason?
+    plop_slider = None
 
     death_preset_button = None
     jump_preset_button = None
@@ -79,7 +79,7 @@ class UI:
         self.pickup_preset_button = Tkinter.Button(self.button_parent, height=self.BUTTON_HEIGHT, width=self.BUTTON_WIDTH, text="Pickup Sound", command=lambda: self.pickup_preset())
         self.pickup_preset_button.grid(row=1, column=2)
 
-        self.laser_preset_button = Tkinter.Button(self.button_parent, height=self.BUTTON_HEIGHT, width=self.BUTTON_WIDTH, text="Laser Sound", command=lambda: self.pickup_preset())
+        self.laser_preset_button = Tkinter.Button(self.button_parent, height=self.BUTTON_HEIGHT, width=self.BUTTON_WIDTH, text="Laser Sound", command=lambda: self.laser_preset())
         self.laser_preset_button.grid(row=1, column=3)
 
         # Play/Save buttons
@@ -141,7 +141,10 @@ class UI:
     def laser_preset(self):
         """Sets sliders to presets for laser sound."""
 
-        pass
+        self.frequency_slider.set(2)
+        self.frequency_shift_slider.set(3)
+        self.plop_slider.set(80)
+        self.echo_slider.set(1)
 
     def change_slider_colour(self, slider, (red, green, blue)):
         """Changes the colour of a slider by a red, green and blue value
