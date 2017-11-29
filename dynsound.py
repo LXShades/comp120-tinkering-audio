@@ -185,6 +185,7 @@ class DynSound:
         """
         # Create a copy of the samples so we can resize them
         sample_array = pygame.sndarray.array(self.sound)
+        copy_array = sample_array.copy()
 
         #if multiplier > 1.0:
             # Increase frequency (shift down samples from later on in the array)

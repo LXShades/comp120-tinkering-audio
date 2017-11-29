@@ -49,6 +49,10 @@ class Generator:
         """Initialises self"""
         self.base_sound = self.create_sine(440, 1.0)
 
+    # Preset sounds.
+    def death_sound(self):
+        pass
+
     def play_sound(self):
         """Previews the sound"""
         self.validate_sound()
