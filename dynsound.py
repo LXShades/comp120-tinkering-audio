@@ -15,6 +15,7 @@ class DynSound:
     sound = None
     num_channels = 0
     sample_rate = 0
+    sample_range = 32767
 
     def __init__(self, file_name):
         """___init___: Create sound from file"""
@@ -38,6 +39,7 @@ class DynSound:
             self.sound = pygame.mixer.Sound(load_file)
             self.num_channels = 2  # TO FIX
             self.sample_rate = 22050  # ALSO TO FIX LOL
+            self.sample_range = 32767  # ETC
 
             if self.sound.get_length() <= 0.1:
                 # Assume that the load failed
@@ -49,6 +51,7 @@ class DynSound:
             self.sound = pygame.mixer.Sound(numpy.ndarray(shape=(num_frames, num_channels), dtype=data_type))
             self.num_channels = num_channels
             self.sample_rate = sample_rate
+            self.sample_range = 32767  # Number magician in the house
 
     def copy(self):
         """Creates and returns a copy of this sound
@@ -121,7 +124,8 @@ class DynSound:
             # TODO: handle clipping
             # TODO: further consideration--mixing mono with stereo sounds
             for channel in xrange(0, num_channels):
-                sample_array[target_start_frame + frame, channel] = numpy.clip(sample_array[target_start_frame + frame, channel] + source_samples[source_start_frame + frame, channel], -32767, 32767)
+                sample_array[target_start_frame + frame, channel] = numpy.clip(sample_array[target_start_frame + frame, channel] + source_samples[source_start_frame + frame, channel],
+                                                                               -self.sample_range, self.sample_range)
 
         # Copy the data back into this sound
         self.sound = pygame.mixer.Sound(sample_array)
@@ -171,6 +175,32 @@ class DynSound:
         # Update the length of sound by recreating it (seems to be the only way to resize a sound)
         self.sound = pygame.mixer.Sound(sample_array)
 
+    def change_frequency_shifting(self,  multiplier, multiplier_shift):
+        """
+        Change the pitch of the sound with a constant shift up or down during playback
+
+        Args:
+            multiplier (float): The base multiplier to be applied to the sound's frequency.
+            multiplier_shift (float): The amount by which the multiplier increases per second
+        """
+        # Create a copy of the samples so we can resize them
+        sample_array = pygame.sndarray.array(self.sound)
+
+        #if multiplier > 1.0:
+            # Increase frequency (shift down samples from later on in the array)
+        for index, sample in numpy.ndenumerate(sample_array):
+            grab = int(index[0] * (multiplier + float(index[0]) / self.sample_rate * multiplier_shift))
+
+            if grab >= sample_array.shape[0]:
+                break
+            else:
+                sample_array[index[0], index[1]] = sample_array[grab, index[1]]
+
+        sample_array.resize((int(math.ceil(sample_array.shape[0] / float(multiplier + float(sample_array.shape[0]) / self.sample_rate * multiplier_shift))), int(sample_array.shape[1])))
+
+        # Update the length of sound by recreating it (seems to be the only way to resize a sound)
+        self.sound = pygame.mixer.Sound(sample_array)
+
     def change_volume(self, db):
         """
         Change the volume of a sound.
@@ -184,7 +214,7 @@ class DynSound:
         multiplier = pow(10, float(db) / 20)
         for index, sample in numpy.ndenumerate(sample_array):
             # Todo limits checking (clipping)
-            sample_array[index[0], index[1]] = numpy.clip(sample_array[index[0], index[1]] * multiplier, -32767, 32767)
+            sample_array[index[0], index[1]] = numpy.clip(sample_array[index[0], index[1]] * multiplier, -self.sample_range, self.sample_range)
 
     def play(self):
         """Play the sound"""

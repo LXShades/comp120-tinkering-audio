@@ -8,12 +8,17 @@ class UI:
 
     main_screen = None
 
+    play_preview = None
+    save_sound = None
+
+    volume_slider = None
+    frequency_slider = None
+    frequency_shift_slider = None
+    echo_slider = None
+
     def __init__(self):
         """
-        Constructor.
-
-        Args:
-            app (App): The class to get button functions from.
+        Initialises and sets up the user interface
         """
 
         self.main_screen = Tkinter.Tk()
@@ -32,17 +37,22 @@ class UI:
         self.save_sound.pack(side=Tkinter.LEFT)
 
         # Volume slider
-        self.volume_slider = Tkinter.Scale(self.main_screen, troughcolor="#ff0000", orient=Tkinter.HORIZONTAL, from_=0, to=100, showvalue=False) # TODO: Fix clipping when increasing volume for greater range
-        self.volume_slider.set(50)
+        self.volume_slider = Tkinter.Scale(self.main_screen, troughcolor="#FFFF00", orient=Tkinter.HORIZONTAL, from_=0, to=100, showvalue=False)
+        self.volume_slider.set(100)
         self.volume_slider.pack()
 
         # Frequency slider
-        self.frequency_slider = Tkinter.Scale(self.main_screen, troughcolor="#ff0000", orient=Tkinter.HORIZONTAL, from_=0.1, to=5.0, resolution=0.1, showvalue=False)
+        self.frequency_slider = Tkinter.Scale(self.main_screen, troughcolor="#000000", orient=Tkinter.HORIZONTAL, from_=0.1, to=5.0, resolution=0.1, showvalue=False)
         self.frequency_slider.set(1)
         self.frequency_slider.pack()
 
+        # Frequency shift slider
+        self.frequency_shift_slider = Tkinter.Scale(self.main_screen, troughcolor="#ff0000", orient=Tkinter.HORIZONTAL, from_=0.1, to=5.0, resolution=0.1, showvalue=False)
+        self.frequency_shift_slider.set(1)
+        self.frequency_shift_slider.pack()
+
         # Echo slider
-        self.echo_slider = Tkinter.Scale(self.main_screen, troughcolor="#0000ff", orient=Tkinter.HORIZONTAL, from_=0, to=10, showvalue=False)
+        self.echo_slider = Tkinter.Scale(self.main_screen, troughcolor="#800080", orient=Tkinter.HORIZONTAL, from_=0, to=10, showvalue=False)
         self.echo_slider.set(0)
         self.echo_slider.pack()
 

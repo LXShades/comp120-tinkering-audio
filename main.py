@@ -62,13 +62,16 @@ class App:
         self.ui.save_sound.config(command=lambda: self.generator.save_sound())
 
         # Volume slider
-        self.ui.volume_slider.config(command=lambda v: self.generator.change_volume(float(v) - 100)) # TODO: Fix clipping when increasing volume for greater range
+        self.ui.volume_slider.config(command=lambda value: self.on_slider_change(self.ui.volume_slider, value)) # TODO: Fix clipping when increasing volume for greater range
 
         # Frequency slider
-        self.ui.frequency_slider.config(command=lambda v: self.generator.change_frequency(self.ui, float(v)))
+        self.ui.frequency_slider.config(command=lambda value: self.on_slider_change(self.ui.frequency_slider, value))
+
+        # Frequency change slider
+        self.ui.frequency_shift_slider.config(command=lambda value: self.on_slider_change(self.ui.frequency_shift_slider, value))
 
         # Echo slider
-        self.ui.echo_slider.config(command=lambda v: self.generator.change_echoes(int(v)))
+        self.ui.echo_slider.config(command=lambda value: self.on_slider_change(self.ui.echo_slider, value))
 
         self.ui.main_screen.mainloop()
 
@@ -88,6 +91,35 @@ class App:
         # self.edit_sound.add_echo(0.3, -4, 10)
 
         # self.edit_sound.save("testSound.wav")
+
+    def on_slider_change(self, slider, value):
+        """Callback function called by the UI when one of the sliders changes
+
+        Args:
+            slider (Tkinter.Scale): A reference to the slider that's changed
+            value (string): The value of the slider as provided by Tkinter
+        """
+        # Update sliders and change their colours on a per-slider basis
+        if slider == self.ui.volume_slider:
+            new_volume = float(value)
+            self.generator.change_volume(new_volume - 100)
+
+            # Giv slidar BIG BOOM YELLOZ
+            self.ui.change_slider_colour(self.ui.volume_slider, (int(new_volume + 100) * 255 / 100, int(new_volume + 100) * 255 / 100, 0))
+        elif slider == self.ui.echo_slider:
+            self.generator.change_echoes(int(value))
+
+            # Make slider da sneakistz purppl
+            self.ui.change_slider_colour(self.ui.echo_slider, (0x80 + int(value) * 0x7F / 10, 0, 0x80 + int(value) * 0x7F / 10))
+        elif slider == self.ui.frequency_slider:
+            self.generator.change_frequency(float(value))
+
+            # Make slider SUPA FAST!!
+            self.ui.change_slider_colour(self.ui.frequency_slider, (int(float(value) * 255 / 5), 0, 0))
+        elif slider == self.ui.frequency_shift_slider:
+            self.generator.change_frequency_shift(float(value))
+
+            self.ui.change_slider_colour(self.ui.frequency_shift_slider, (255, 255, 255))
 
     def quit(self):
         """Quits the application"""
