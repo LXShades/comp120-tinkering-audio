@@ -89,6 +89,10 @@ class App:
             self.generator.sound_length = float(value)
             self.generator.sound_valid = False
 
+            # Make slidar DED ARD!!!
+            black_factor = int(value) * 255 / 10
+
+            self.ui.change_slider_colour(self.ui.length_slider, (255 - black_factor, 255 - black_factor, 255 - black_factor))
         elif slider == self.ui.volume_slider:
             new_volume = float(value)
             self.generator.change_volume(new_volume - 100)
@@ -104,13 +108,18 @@ class App:
             self.generator.change_frequency(float(value))
 
             # Make slider SUPA FAST!!
-            self.ui.change_slider_colour(self.ui.frequency_slider, (int(float(value) * 255 / 5), 0, 0))
+            frequency_factor = int(float(value) * 255 / 5)
+            self.ui.change_slider_colour(self.ui.frequency_slider, (frequency_factor, 0, 128 - frequency_factor / 2))
         elif slider == self.ui.frequency_shift_slider:
             self.generator.change_frequency_shift(float(value))
 
-            self.ui.change_slider_colour(self.ui.frequency_shift_slider, (255, 255, 255))
+            # Make slidar LUCKY
+            self.ui.change_slider_colour(self.ui.frequency_shift_slider, (50, 50, float(value) * 255 / 5))
         elif slider == self.ui.plop_slider:
             self.generator.change_plopper(float(value))
+
+            # Sound like DEFF! AAAAGH!
+            self.ui.change_slider_colour(self.ui.plop_slider, (0, 255 - (int(value) * 255 / 100), 0))
 
 # Main code run!
 App()

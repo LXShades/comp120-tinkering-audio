@@ -58,6 +58,7 @@ class Generator:
         self.mixer_num_channels = num_channels
         self.mixer_sample_size = sample_size
         self.base_sound = self.create_sine(440, 1.0)
+        self.edit_sound = self.base_sound.copy()
 
     def play_sound(self):
         """Previews the sound"""
@@ -82,6 +83,10 @@ class Generator:
 
         if self.sound_valid:
             return
+
+        # Stop the current sound
+        if self.edit_sound.sound:
+            self.edit_sound.sound.stop()
 
         # Regenerate the 2-second A4 base sine wave (note: in a stretch-goal version the user could select the base sound)
         self.base_sound = self.create_sine(440, self.frequency * self.sound_length)  # self.frequency is used to rebalance the length of the final sound before change_frequency is called
