@@ -43,6 +43,7 @@ class App:
     # User interface
     volume_slider = None
     frequency_slider = None
+    echo_slider = None
 
     def __init__(self):
         """Class constructor"""
@@ -106,6 +107,11 @@ class App:
         self.frequency_slider.set(1)
         self.frequency_slider.pack()
 
+        # Echo slider
+        self.echo_slider = Tkinter.Scale(self.main_screen, troughcolor="#0000ff", orient=Tkinter.HORIZONTAL, from_=0, to=10, command=lambda v: self.change_echoes(int(v)))
+        self.echo_slider.set(0)
+        self.echo_slider.pack()
+
         top_frame.pack()
 
     def run(self):
@@ -165,6 +171,20 @@ class App:
 
         self.frequency = frequency_multiplier
         self.frequency_slider.config(troughcolor=new_colour)
+        self.sound_valid = False
+
+    def change_echoes(self, echo_num):
+        """Set the number of echoes.
+
+        Args:
+            echo_num (int): Number of echoes to add.
+        """
+
+        #new_colour = "#" + format(0x800080 + echo_num, "02x") + "0000"
+        new_colour = "#0000FF"
+
+        self.echo_count = echo_num
+        self.echo_slider.config(troughcolor=new_colour)
         self.sound_valid = False
 
     def create_sine(self, frequency, length):
