@@ -73,6 +73,9 @@ class App:
         # Echo slider
         self.ui.echo_slider.config(command=lambda value: self.on_slider_change(self.ui.echo_slider, value))
 
+        # Plop slider
+        self.ui.plop_slider.config(command=lambda value: self.on_slider_change(self.ui.plop_slider, value))
+
         self.ui.main_screen.mainloop()
 
         # TODO testing new ui
@@ -120,6 +123,8 @@ class App:
             self.generator.change_frequency_shift(float(value))
 
             self.ui.change_slider_colour(self.ui.frequency_shift_slider, (255, 255, 255))
+        elif slider == self.ui.plop_slider:
+            self.generator.change_plopper(float(value))
 
     def quit(self):
         """Quits the application"""

@@ -217,6 +217,36 @@ class DynSound:
             # Todo limits checking (clipping)
             sample_array[index[0], index[1]] = numpy.clip(sample_array[index[0], index[1]] * multiplier, -self.sample_range, self.sample_range)
 
+    def add_plopper(self, plopper_rate):
+        """
+        Adds plop effect
+
+        Args:
+             plopper_rate (float): Number of plops per second
+        """
+
+        # Don't divide by zero or an extremely small amount
+        if plopper_rate <= 1:
+            return
+
+        # Produce plop effect
+        sample_array = pygame.sndarray.samples(self.sound)
+
+        high_index = 22050 / plopper_rate
+        length = sample_array.shape[0]
+        while high_index < length:
+            section_end = high_index + 22050 / plopper_rate
+
+            if section_end > length:
+                section_end = length
+
+            for low_index in xrange(int(high_index), int(section_end)):
+                for channel in xrange(0, self.num_channels):
+                    sample_array[low_index, channel] = 0
+
+            high_index += (22050 / plopper_rate) * 2
+
+
     def play(self):
         """Play the sound"""
         self.sound.play()
