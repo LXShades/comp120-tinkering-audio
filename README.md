@@ -10,13 +10,14 @@ a pickup, jump, death and laser.
 
 ## User Manual
 
-This simple tool can be used to create basic sounds. Use the sliders to change the properties of the sound, and the Play button
-to preview it. The Save button can be used to save your sound as a .wav file when you are finished.  
+This simple tool can be used to create basic sounds. Use the sliders to change the properties of the sound, and the Play button to preview it. The Save button can be used to save your sound as a .wav file when you are finished.  
 
 Using the preset sound buttons will automatically move the sliders to create the preset sounds.  
 
 What do the sliders do you ask? Easy, they change the colour of your sound! More yello, red, white, blue and purpleness!
 No. We won't be serious. We are being creative.
+
+(Not that the green slider will be overridden if the white slider is greater than 0)
 
 ## Requirements
 
