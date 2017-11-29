@@ -87,6 +87,9 @@ class Generator:
         if self.sound_valid:
             return
 
+        # Regenerate the 2-second A4 base sine wave (note: in a stretch-goal version the user could select the base sound)
+        self.base_sound = self.create_sine(440, self.frequency)  # self.frequency is used to rebalance the length of the final sound before change_frequency is called
+
         # Recopy the base sound
         self.edit_sound = self.base_sound.copy()
 
@@ -94,9 +97,9 @@ class Generator:
         if self.volume is not 0:
             self.edit_sound.change_volume(self.volume)
 
-        if self.frequency is not 1.0 and self.frequency_shift is 0.0:
+        if self.frequency != 1.0 and self.frequency_shift == 0.0:
             self.edit_sound.change_frequency(self.frequency)
-        elif self.frequency_shift is not 0.0:
+        elif self.frequency_shift != 0.0:
             self.edit_sound.change_frequency_shifting(self.frequency, self.frequency_shift)
 
         if self.plops_per_second > 0:
@@ -128,7 +131,7 @@ class Generator:
             frequency_multiplier (float): The new multiplier for the sound frequency
         """
 
-        self.frequency = frequency_multiplier
+        self.frequency = float(frequency_multiplier)
         self.sound_valid = False
 
     def change_frequency_shift(self, frequency_shift):
@@ -175,7 +178,7 @@ class Generator:
             (DynSound) A sine wave
         """
 
-        sound = DynSound(num_frames=int(length * 22050))
+        sound = DynSound(num_frames=int(length * self.mixer_sample_rate))
         samples = pygame.sndarray.samples(sound.sound)
 
         minimum_value = sound.sample_min
@@ -184,9 +187,8 @@ class Generator:
         sample_range = sound.sample_max - centre_value
 
         for index, sample in numpy.ndenumerate(samples):
-            samples[index[0], index[1]] = centre_value + math.sin(2.0 * math.pi * frequency * index[0] / 22050) * sample_range
+            samples[index[0], index[1]] = centre_value + math.sin(2.0 * math.pi * frequency * index[0] / self.mixer_sample_rate) * sample_range
 
         del samples
 
         return sound
-    

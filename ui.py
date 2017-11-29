@@ -106,7 +106,7 @@ class UI:
 
         # Plop slider
         self.plop_slider = Tkinter.Scale(self.slider_parent, length=self.SLIDER_WIDTH, width=self.SLIDER_HEIGHT, troughcolor="#0000ff", orient=Tkinter.HORIZONTAL, from_=0, to=100, resolution=1, showvalue=True)
-        self.plop_slider.set(1)
+        self.plop_slider.set(0)
         self.plop_slider.grid(row=5, columnspan=4)
 
         # Echo slider
