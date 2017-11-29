@@ -51,7 +51,7 @@ class App:
         pygame.mixer.init(frequency=self.FREQUENCY, size=self.SIZE, channels=self.CHANNELS, buffer=self.BUFFER)
 
         # Initialise ui and generator
-        self.generator = Generator()
+        self.generator = Generator(self.FREQUENCY, self.SIZE, self.CHANNELS, self.BUFFER)
         self.ui = UI()
 
         # Initialise slider commands
