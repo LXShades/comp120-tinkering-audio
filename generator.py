@@ -50,11 +50,6 @@ class Generator:
         """Initialises self"""
         self.base_sound = self.create_sine(440, 1.0)
 
-    def pickup_sound(self):
-        second_sound = self.base_sound.copy()
-        second_sound.change_frequency(3)
-        self.base_sound.mix(second_sound)
-
     def play_sound(self):
         """Previews the sound"""
         self.validate_sound()
