@@ -15,31 +15,32 @@ class DynSound:
     sound = None
     num_channels = 0
     sample_rate = 0
-    sample_range = 32767
+    sample_range = 0
+    sample_min = 0
+    sample_max = 0
 
     def __init__(self, file_name):
         """___init___: Create sound from file"""
+
         self.sound = pygame.mixer.Sound(file_name)
         self.num_channels = 2
 
         self.sample_rate = 22050
 
-    def __init__(self, load_file="", num_channels=2, num_frames=1, sample_rate=22050, data_type="<i2"):
-        """Create empty sound or loads a file if load_file is not ""
-            Args:
-                load_file: Filename to load (overrides other arguments!)
-                num_channels: Number of channel in the sound
-                num_frames: Length of the sound in frames
-                sample_rate: Sample rate of sound
-                data_type: Type of data for samples. Usually signed 2-byte int
+    def __init__(self, load_file="", num_frames=1, num_channels=2, sample_rate=22050, data_type="<h"):
+        """Create empty sound or loads a file if load_file is not "".
+
+        Args:
+            load_file: Filename to load. Overrides num_frames
+            num_frames: Length of the sound in frames. Used if load_file is N/A, to decide the length of the default wave
+            num_channels: Number of channels in the mixer. This must match pygame.mixer's initialisation values.
+            sample_rate: Sample rate. This must match pygame.mixer's initialised values.
+            data_type: Type of data for samples. Usually signed 2-byte int. This must match pygame.mixer's initialised data type.
         """
 
         # Load a file if a filename was provided
         if load_file:
             self.sound = pygame.mixer.Sound(load_file)
-            self.num_channels = 2  # TO FIX
-            self.sample_rate = 22050  # ALSO TO FIX LOL
-            self.sample_range = 32767  # ETC
 
             if self.sound.get_length() <= 0.1:
                 # Assume that the load failed
@@ -49,15 +50,27 @@ class DynSound:
         # If no sound was provided or loaded, create an empty sound
         if self.sound is None:
             self.sound = pygame.mixer.Sound(numpy.ndarray(shape=(num_frames, num_channels), dtype=data_type))
-            self.num_channels = num_channels
-            self.sample_rate = sample_rate
-            self.sample_range = 32767  # Number magician in the house
+
+        # Set sound parameters
+        self.num_channels = num_channels
+        self.sample_rate = sample_rate
+
+        if data_type.islower():
+            self.sample_range = (1 << (struct.calcsize(data_type) * 8)) - 1
+            self.sample_min = -self.sample_range / 2 # signed range
+            self.sample_max = self.sample_range / 2
+        else:
+            self.sample_range = (1 << (struct.calcsize(data_type) * 8)) - 1  # unsigned range
+            self.sample_min = 0
+            self.sample_max = self.sample_range
 
     def copy(self):
         """Creates and returns a copy of this sound
 
-             Returns: (Sound) The copy
+        Returns:
+            (Sound) The copy
         """
+
         samples = pygame.sndarray.samples(self.sound)
 
         new_sound = DynSound(num_channels=self.num_channels, num_frames=samples.shape[0], sample_rate=self.sample_rate)
@@ -67,11 +80,12 @@ class DynSound:
 
     def save(self, file_name):
         """
-        Saves a sound to disk.
+        Saves this sound to disk.
 
         Args:
              file_name (string): The file name to save the sound with. File extension must be included.
         """
+
         samples = pygame.sndarray.samples(self.sound)
 
         # Create/open WAV
@@ -91,6 +105,20 @@ class DynSound:
         # Done!
         saved_sound.close()
 
+    def resize(self, num_frames):
+        """Resizes this sound to a precise number of frames
+
+        Args:
+            num_frames (int): New length of the sound, in frames
+        """
+
+        # Create a copy of the sound's samples (surprise! This seems to be the only way we can resize it).
+        sample_array = pygame.sndarray.array(self.sound)
+
+        sample_array.resize((num_frames, sample_array.shape[1]))
+
+        self.sound = pygame.mixer.Sound(sample_array)
+
     def mix(self, source, target_start=0.0, source_start=0.0, length=-1):
         """Mixes this sound with another
 
@@ -101,6 +129,7 @@ class DynSound:
             length (float in seconds): Length of the sound section being mixed.
                                        -1 will use the length of the source sound
         """
+
         # Load the source samples
         source_samples = pygame.sndarray.array(source.sound)
 
@@ -108,7 +137,7 @@ class DynSound:
         target_start_frame = int(target_start * self.sample_rate)
         source_start_frame = int(source_start * self.sample_rate)
         num_frames = int(length * self.sample_rate)
-        num_channels = 2  # TODO
+        num_channels = self.num_channels
 
         if source_start_frame + num_frames >= source_samples.shape[0] or length == -1:
             num_frames = source_samples.shape[0] - source_start_frame
@@ -121,11 +150,9 @@ class DynSound:
 
         # Mix the sounds!
         for frame in xrange(0, num_frames):
-            # TODO: handle clipping
-            # TODO: further consideration--mixing mono with stereo sounds
             for channel in xrange(0, num_channels):
                 sample_array[target_start_frame + frame, channel] = numpy.clip(int(sample_array[target_start_frame + frame, channel]) + source_samples[source_start_frame + frame, channel],
-                                                                               -self.sample_range, self.sample_range)
+                                                                               self.sample_min, self.sample_max)
 
         # Copy the data back into this sound
         self.sound = pygame.mixer.Sound(sample_array)
@@ -139,11 +166,13 @@ class DynSound:
             volume_change (float): Reduction of volume per echo, in dB
             num_echoes (int): Number of echoes
         """
+
         original_sound = self.copy()
+
         for i in xrange(0, num_echoes):
-            shut_up = original_sound.copy()
-            shut_up.change_volume(volume_change * (i + 1))
-            self.mix(shut_up, delay * (i + 1))
+            overlay = original_sound.copy()
+            overlay.change_volume(volume_change * (i + 1))
+            self.mix(overlay, delay * (i + 1))
 
     def change_frequency(self,  multiplier):
         """
@@ -152,6 +181,7 @@ class DynSound:
         Args:
             multiplier (float): The multiplier to be applied to the sound's frequency.
         """
+
         # Create a copy of the samples so we can resize them
         sample_array = pygame.sndarray.array(self.sound)
 
@@ -183,16 +213,14 @@ class DynSound:
             multiplier (float): The base multiplier to be applied to the sound's frequency.
             multiplier_shift (float): The amount by which the multiplier increases per second
         """
+
         # Create a copy of the samples so we can resize them
         sample_array = pygame.sndarray.array(self.sound)
-        copy_array = sample_array.copy()
 
-        #if multiplier > 1.0:
-            # Increase frequency (shift down samples from later on in the array)
         for index, sample in numpy.ndenumerate(sample_array):
             grab = int(index[0] * (multiplier + float(index[0]) / self.sample_rate * multiplier_shift))
 
-            if grab >= sample_array.shape[0]:
+            if grab >= sample_array.shape[0] or grab < 0:
                 break
             else:
                 sample_array[index[0], index[1]] = sample_array[grab, index[1]]
@@ -209,13 +237,14 @@ class DynSound:
         Args:
             db (float): Decibels to change sound volume by.
         """
+
         sample_array = pygame.sndarray.samples(self.sound)
 
-        # Multiply all samples according to the db given
+        # Multiply all samples according to the dB given
         multiplier = pow(10, float(db) / 20)
         for index, sample in numpy.ndenumerate(sample_array):
             # Todo limits checking (clipping)
-            sample_array[index[0], index[1]] = numpy.clip(sample_array[index[0], index[1]] * multiplier, -self.sample_range, self.sample_range)
+            sample_array[index[0], index[1]] = numpy.clip(sample_array[index[0], index[1]] * multiplier, self.sample_min, self.sample_max)
 
     def add_plopper(self, plopper_rate):
         """
@@ -225,8 +254,8 @@ class DynSound:
              plopper_rate (float): Number of plops per second
         """
 
-        # Don't divide by zero or an extremely small amount
-        if plopper_rate <= 1:
+        # Don't divide by extremely small amounts (slight hack: checking if it is 0.0 has given me errors in the past where Python divided by zero anyway, so using 0.0001)
+        if plopper_rate <= 0.0001:
             return
 
         # Produce plop effect
@@ -246,8 +275,7 @@ class DynSound:
 
             high_index += self.sample_rate / plopper_rate
 
-
     def play(self):
         """Play the sound"""
-        self.sound.play()
 
+        self.sound.play()

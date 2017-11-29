@@ -16,25 +16,27 @@ class Generator:
         SIZE (int): Size of sound in bits.
         CHANNELS (int): Number of channels.
         BUFFER (int): Size of buffer.
-        SAMPLE_RANGE (int): Approximate min and max range of sound samples
 
-        main_screen (Tkinter.Tk): The main application screen.
-        running (bool): If the program is running or not.
+        edit_sound (DynSound): Sound after edits have been applied
+        base_sound (DynSound): Original sound before edits are applied
+        sound_valid (boolean): Whether the sound is valid. If invalid, sound will be validated before being played or saved
+
+        volume (float): Volume offset effect
+        frequency (float): Frequency multiplier for sound
+        frequency_shift (float): Rate of frequency increase or decrease over time
+        echo_count (int): Number of echoes to follow the sound
+        plops_per_second (int): Plop effect for sounds
     """
 
     FREQUENCY = 22050
     SIZE = -16
     CHANNELS = 2
     BUFFER = 4096
-    SAMPLE_RANGE = 32767
 
-    main_screen = None
-    running = False
     edit_sound = None
-    base_sound = None  # Original loaded sound or sine wave
-    sound_valid = False  # Whether parameters have changed and the sound needs to be regenerated
+    base_sound = None
+    sound_valid = False
 
-    # Effects
     volume = 0  # Volume offset
     frequency = 1  # Frequency multiplier
     frequency_shift = 0  # in multiplier per second (TODO)
@@ -46,17 +48,20 @@ class Generator:
     frequency_slider = None
     echo_slider = None
 
-    def __init__(self):
+    def __init__(self, frequence, size, channels, buffer):
         """Initialises sound generator with a base sine wave"""
+
         self.base_sound = self.create_sine(440, 1.0)
 
     def play_sound(self):
         """Previews the sound"""
+
         self.validate_sound()
         self.edit_sound.play()
 
     def save_sound(self):
         """Saves the sound as a WAV with a user-selected name"""
+
         self.validate_sound()
 
         # Give the user a prompt to save the sound
@@ -68,6 +73,7 @@ class Generator:
 
     def validate_sound(self):
         """Regenerate sound from base elements"""
+
         if self.sound_valid:
             return
 
@@ -93,7 +99,8 @@ class Generator:
         self.sound_valid = True
 
     def change_volume(self, new_volume):
-        """Sets the volume of the main edited sound
+        """
+        Sets the volume of the main edited sound
 
         Args:
             new_volume (float): The offset to increase (or decrease) volume by.
@@ -104,25 +111,30 @@ class Generator:
         self.sound_valid = False
 
     def change_frequency(self, frequency_multiplier):
-        """Sets the frequency of the main edited sound
+        """
+        Sets the frequency of the main edited sound
 
         Args:
             frequency_multiplier (float): The new multiplier for the sound frequency
         """
+
         self.frequency = frequency_multiplier
         self.sound_valid = False
 
     def change_frequency_shift(self, frequency_shift):
-        """Sets the frequency shift of the main edited sound
+        """
+        Sets the frequency shift of the main edited sound
 
         Args:
             frequency_shift (float): The new rate of shift for frequency, in multipliers / sec
         """
+
         self.frequency_shift = frequency_shift
         self.sound_valid = False
 
     def change_echoes(self, echo_num):
-        """Set the number of echoes.
+        """
+        Set the number of echoes.
 
         Args:
             echo_num (int): Number of echoes to add.
@@ -132,15 +144,19 @@ class Generator:
         self.sound_valid = False
 
     def change_plopper(self, plops_per_second):
-        """Sets plops per second
+        """
+        Sets plops per second
 
         Args:
-            plops_per_second (float): Number of plops per second (sound effect)"""
+            plops_per_second (float): Number of plops per second (sound effect)
+        """
+
         self.plops_per_second = plops_per_second
         self.sound_valid = False
 
     def create_sine(self, frequency, length):
-        """Creates a sine wave
+        """
+        Creates a sine wave
 
         Args:
             frequency (int): Frequency of the sine wave in hZ
@@ -148,11 +164,14 @@ class Generator:
         Returns:
             (DynSound) A sine wave
         """
+
         sound = DynSound(num_frames=int(length * 22050))
         samples = pygame.sndarray.samples(sound.sound)
+        minimum_value = sound.sample_min
+        maximum_value = sound.sample_max
 
         for index, sample in numpy.ndenumerate(samples):
-            samples[index[0], index[1]] = math.sin(2.0 * math.pi * frequency * index[0] / 22050) * self.SAMPLE_RANGE
+            samples[index[0], index[1]] = math.sin(2.0 * math.pi * frequency * index[0] / 22050) * sound.sample_range
 
         del samples
 

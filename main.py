@@ -20,17 +20,17 @@ class App:
         SIZE (int): Size of sound in bits.
         CHANNELS (int): Number of channels.
         BUFFER (int): Size of buffer.
-        SAMPLE_RANGE (int): Approximate min and max range of sound samples
 
-        main_screen (Tkinter.Tk): The main application screen.
         running (bool): If the program is running or not.
+
+        generator (Generator): App sound generator
+        ui (UI): App user interface
     """
 
     FREQUENCY = 22050
     SIZE = -16
     CHANNELS = 2
     BUFFER = 4096
-    SAMPLE_RANGE = 32767
 
     running = False
 
@@ -77,7 +77,8 @@ class App:
         self.ui.main_screen.mainloop()
 
     def on_slider_change(self, slider, value):
-        """Callback function called by the UI when one of the sliders changes
+        """
+        Callback function called by the UI when one of the sliders changes
 
         Args:
             slider (Tkinter.Scale): A reference to the slider that's changed

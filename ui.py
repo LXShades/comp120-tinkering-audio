@@ -42,9 +42,7 @@ class UI:
     laser_preset_button = None
 
     def __init__(self):
-        """
-        Initialises and sets up the user interface
-        """
+        """Initialises and sets up the user interface"""
 
         self.main_screen = Tkinter.Tk()
 
@@ -52,6 +50,7 @@ class UI:
 
     def init_ui(self):
         """Initialise ui elements."""
+
         top_frame = Tkinter.Frame(self.main_screen)
 
         # Preset sound buttons.
@@ -102,6 +101,7 @@ class UI:
 
     def death_preset(self):
         """Sets sliders to presets for death sound."""
+
         self.frequency_slider.set(2)
         self.frequency_shift_slider.set(0)
         self.plop_slider.set(4)
@@ -109,6 +109,7 @@ class UI:
 
     def pickup_preset(self):
         """Sets sliders to presets for pickup sound."""
+
         self.frequency_slider.set(3)
         self.frequency_shift_slider.set(3)
         self.plop_slider.set(28)
@@ -116,6 +117,7 @@ class UI:
 
     def jump_preset(self):
         """Sets sliders to presets for jump sound."""
+
         self.frequency_slider.set(2)
         self.frequency_shift_slider.set(3)
         self.plop_slider.set(0)
@@ -123,6 +125,7 @@ class UI:
 
     def laser_preset(self):
         """Sets sliders to presets for laser sound."""
+
         pass
 
     def change_slider_colour(self, slider, (red, green, blue)):
