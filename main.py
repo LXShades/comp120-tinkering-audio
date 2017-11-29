@@ -32,7 +32,7 @@ class App:
     running = False
     edit_sound = None
     base_sound = None  # Original loaded sound or sine wave
-    sound_needs_updating = True  # Whether parameters have changed and the sound needs to be regenerated
+    sound_valid = False  # Whether parameters have changed and the sound needs to be regenerated
 
     # Effects
     volume = 0  # Volume offset
@@ -40,7 +40,9 @@ class App:
     frequency_change = 0  # in multiplier per second (TODO)
     echo_count = 0  # Number of echoes
 
+    # User interface
     volume_slider = None
+    frequency_slider = None
 
     def __init__(self):
         """Class constructor"""
@@ -64,7 +66,7 @@ class App:
 
     def validate_sound(self):
         """Regenerate sound from base elements"""
-        if not self.sound_needs_updating:
+        if self.sound_valid:
             return
 
         # Recopy the base sound
@@ -81,27 +83,30 @@ class App:
             self.edit_sound.add_echo(0.3, -4, self.echo_count)
 
         # Validate sound
-        self.sound_needs_updating = False
+        self.sound_valid = True
 
     def init_ui(self):
         """Initialise ui elements."""
 
+        # Play/Save buttons
         top_frame = Tkinter.Frame(self.main_screen)
+
         play_preview = Tkinter.Button(top_frame, text="Play Sound", command=lambda: self.play_sound())
         play_preview.pack(side=Tkinter.LEFT)
         save_sound = Tkinter.Button(top_frame, text="Save Sound", command=lambda: self.save_sound())
         save_sound.pack(side=Tkinter.LEFT)
 
-        volume_up = Tkinter.Button(self.main_screen, text="Volume Up", command=lambda: self.change_volume(10))
-        volume_down = Tkinter.Button(self.main_screen, text="Volume Down", command=lambda: self.change_volume(-10))
-
+        # Volume slider
         self.volume_slider = Tkinter.Scale(self.main_screen, troughcolor="#ff0000", orient=Tkinter.HORIZONTAL, from_=0, to=100, command=lambda v: self.change_volume(float(v) - 100)) # TODO: Fix clipping when increasing volume for greater range
         self.volume_slider.set(50)
         self.volume_slider.pack()
 
+        # Frequency slider
+        self.frequency_slider = Tkinter.Scale(self.main_screen, troughcolor="#ff0000", orient=Tkinter.HORIZONTAL, from_=0.1, to=5.0, resolution=0.1, command=lambda v: self.change_frequency(float(v)))
+        self.frequency_slider.set(1)
+        self.frequency_slider.pack()
+
         top_frame.pack()
-        volume_up.pack()
-        volume_down.pack()
 
     def run(self):
         """Runs the application."""
@@ -136,18 +141,31 @@ class App:
         self.running = False
 
     def change_volume(self, new_volume):
-        """Decreases the volume by offset
+        """Sets the volume of the main edited sound
 
         Args:
             new_volume (float): The offset to increase (or decrease) volume by.
         """
 
-        # Change colour of slider when volume is changed.
-        new_colour = "#" + str(format((int(new_volume) + 100) * 255 / 100, "02x")) + "0000"
+        # Change colour of slider when volume is changed (white to black)
+        normalised_volume = int((new_volume + 100) * 255 / 100)
+        new_colour = "#" + format(0xFFFFFF - normalised_volume - (normalised_volume << 8) - (normalised_volume << 16), "06x")
 
         self.volume = new_volume
         self.volume_slider.config(troughcolor=new_colour)
-        self.sound_needs_updating = True
+        self.sound_valid = False
+
+    def change_frequency(self, frequency_multiplier):
+        """Sets the frequency of the main edited sound
+
+        Args:
+            frequency_multiplier (float): The new multiplier for the sound frequency
+        """
+        new_colour = "#" + format(int(frequency_multiplier * 255 / 5), "02x") + "0000"
+
+        self.frequency = frequency_multiplier
+        self.frequency_slider.config(troughcolor=new_colour)
+        self.sound_valid = False
 
     def create_sine(self, frequency, length):
         """Creates a sine wave
